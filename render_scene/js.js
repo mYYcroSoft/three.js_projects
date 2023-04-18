@@ -7,12 +7,16 @@ var camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight
 
 var renderer = new THREE.WebGLRenderer({antialias: true});
 
+
+
 renderer.setSize(window.innerWidth,window.innerHeight);
 $('body').append(renderer.domElement);
  
 camera.position.x = 0
-camera.position.y = 0
+camera.position.y = 1
 camera.position.z = 0
+camera.rotation.y = 0.1
+camera.rotation.x = -0.1
 
 var geometry = new THREE.BoxGeometry(1,1,1);
 
@@ -75,44 +79,59 @@ function animate() {
 // PLAYER
 
 
-var player = new THREE.Mesh( new THREE.BoxGeometry(0.01,0.01,0.01), new THREE.MeshBasicMaterial({color: new THREE.Color("rgb( 5, 250, 206)")}));
-scene.add(player)
-player.position.z= -1;
-player.position.y= 0.1; 
-player.position.x= -1;
+
+var p_geometry = new THREE.BoxGeometry(1,1,1);
+var p_material = new THREE.MeshBasicMaterial({color: new THREE.Color('rgb(118, 52, 250)')});
+var p_cube = new THREE.Mesh(p_geometry,p_material);
+p_cube.position.z = -6;
+p_cube.position.x = -6;
+p_cube.receiveShadow = true;
+scene.add(p_cube)
 
 
 
 // player controls:
 
+const player_data = p_cube
 window.addEventListener("keydown", function(event) {
     if (event.key === "w") {
       // Spuštění funkce při stisknutí klávesy "W"
       console.log("[Cube] > Go front")
-      cube.position.x = cube.position.x + 0.1
+      player_data.position.x = player_data.position.x + 0.1
         camera.position.x = camera.position.x + 0.1
       renderer.render(scene,camera);
+
+      if(player_data.position.x == cube.position.x){
+        console.log("DANGER")
+        player_data.position.x = -4
+      }
     }
     if (event.key === "s") {
         // Spuštění funkce při stisknutí klávesy "W"
         console.log("[Cube] > Go back")
-        cube.position.x = cube.position.x - 0.1
+        player_data.position.x = player_data.position.x - 0.1
         camera.position.x = camera.position.x - 0.1
         renderer.render(scene,camera);
     }
-    if (event.key === "b") {
-        // Spuštění funkce při stisknutí klávesy "W"
-        console.log("[Cube] > Go back")
-        changePos(cube, {x: cube.position.x, y: 2}, 100);
-  
-        setTimeout(function() {
-            changePos(cube, {x: cube.position.x, y: 0}, 100);
-        }, 100);
-        animate();
-        renderer.render(scene,camera);
-      }
-
+    
   });
+  
+      window.addEventListener("keydown", function(event) {
+      if (event.key === "a") {
+          // Spuštění funkce při stisknutí klávesy "B"
+          console.log("[Cube] > Go back")
+          changePos(player_data, { y: 1}, 50);
+          animate();
+          renderer.render(scene,camera);
+        }
+      if (event.key === "d") {
+          // Spuštění funkce při stisknutí klávesy "B"
+          console.log("[Cube] > Go back")
+          changePos(player_data, { y: 0}, 50);
+          animate();
+          renderer.render(scene,camera);
+        }
+      })
 
 
 
@@ -121,18 +140,26 @@ window.addEventListener("keydown", function(event) {
 // ----------------------------------------
 
 // FLOOR
-var f_geometry = new THREE.BoxGeometry(20,1,6);
+var f_geometry = new THREE.BoxGeometry(20,1,2);
 var f_color = new THREE.Color( 404040 );
-var f_material = new THREE.MeshBasicMaterial({color: f_color});
+var f_material = new THREE.MeshBasicMaterial({color: new THREE.Color('rgb(104, 62, 125 )')});
 var floor = new THREE.Mesh(f_geometry,f_material);
-scene.add(floor)
+var floor_up = new THREE.Mesh(f_geometry,f_material);
+floor.receiveShadow = true;
+floor_up.receiveShadow = true;
+scene.add(floor, floor_up)
 floor.position.z= -6;
-floor.position.y= -2; 
+floor.position.y= -1; 
 floor.position.x= 0;
+floor_up.position.z= -6;
+floor_up.position.y= 2; 
+floor_up.position.x= 0;
 
 
 
 
-
+const light = new THREE.AmbientLight( 0x404040 ); // soft white light
+scene.add( light );
+light.position.z = -6;
 renderer.render(scene,camera);
 
