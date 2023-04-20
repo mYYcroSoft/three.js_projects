@@ -28,7 +28,7 @@ var door = new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({color: 0xff0000}
 scene.add(cube, door);
 
 door.position.z= -6;
-door.position.x= 0;
+door.position.x= +1;
 
 cube.position.x = 3;
 cube.position.z = -6;
@@ -95,11 +95,7 @@ function animate() {
 // ADD OBJECT FUNTIONrender_scene/js.jschan
 
 // ----------------------------------------
-// SCENE
-// PLAYER
-
-
-
+// SCENE player
 var p_geometry = new THREE.BoxGeometry(1,1,1);
 var p_material = new THREE.MeshBasicMaterial({color: new THREE.Color('rgb(118, 52, 250)')});
 var p_cube = new THREE.Mesh(p_geometry,p_material);
@@ -107,6 +103,7 @@ p_cube.position.z = -6;
 p_cube.position.x = -6;
 p_cube.receiveShadow = true;
 scene.add(p_cube)
+
 
 
 
@@ -122,9 +119,17 @@ if (mode == 'game'){
     if (event.key === "w") {
       // Spuštění funkce při stisknutí klávesy "W"
       console.log("[Cube] > Go front")
-      player_data.position.x = player_data.position.x + 0.1
+      console.log(p_cube.position.x)
+      console.log(cube.position.x)
+      if (player_data.position.x - door.position.x > 1 || player_data.position.x - cube.position.x > 1){
+        console.log("Block is near")
+      } else{
+        player_data.position.x = player_data.position.x + 0.1
         camera.position.x = camera.position.x + 0.1
-      renderer.render(scene,camera);
+        renderer.render(scene,camera);
+      }
+      
+      
 
       if(player_data.position.x == cube.position.x){
         console.log("DANGER")
@@ -153,6 +158,15 @@ if (mode == 'game'){
       animate();
       renderer.render(scene,camera);
     }
+  }
+  if (event.key === "b"){
+    console.log("JUMP")
+    changePos(player_data, {y: +1}, 100);
+    animate();
+   setTimeout(() => {
+    changePos(player_data, {y:  -0}, 100);
+    animate();
+   }, 100);
   }
     
   })
@@ -219,7 +233,7 @@ if (mode == 'game'){
 // ----------------------------------------
 
 // FLOOR
-var f_geometry = new THREE.BoxGeometry(20,1,2);
+var f_geometry = new THREE.BoxGeometry(200,1,2);
 var f_color = new THREE.Color( 404040 );
 var f_material = new THREE.MeshBasicMaterial({color: new THREE.Color('rgb(104, 62, 125 )')});
 var floor = new THREE.Mesh(f_geometry,f_material);
@@ -234,14 +248,12 @@ floor_up.position.z= -6;
 floor_up.position.y= 2; 
 floor_up.position.x= 0;
 
-
-
-
-
-
 // TERRAIN SCENE
 const light = new THREE.AmbientLight( 0x404040 ); // soft white light
 scene.add( light );
 light.position.z = -6;
 renderer.render(scene,camera);
 
+
+
+// OBJECT PHYSCI
